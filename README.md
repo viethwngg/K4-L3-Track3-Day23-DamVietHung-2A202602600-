@@ -57,6 +57,9 @@ truy vấn riêng quá hẹp. Tất cả lỗi nội dung/metadata được tr�
 Với mô hình reasoning OpenAI cần Responses API để dùng tools, đặt
 `LAB_USE_RESPONSES_API=1` và `LAB_REASONING_EFFORT=low` trong `.env`.
 Các tùy chọn này được áp dụng trong `research.py`; `model.py` có sẵn không sửa.
+Nếu API tìm kiếm arXiv liên tục trả 429, có thể đặt `LAB_SKIP_ARXIV_SEARCH=1`
+cho riêng lượt chạy để dùng `hf-daily`, `hf-search` và các trang gốc qua `web_fetch`;
+công cụ arXiv vẫn được giữ và hoạt động bình thường khi không bật tùy chọn này.
 
 Kiểm tra mã không cần khóa LLM:
 

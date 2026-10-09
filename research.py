@@ -80,6 +80,11 @@ def build_prompt(topic, daily_count=0):
                          "evidence to its assigned notes file. Preserve those actual hf-daily "
                          "labels/URLs, and cite at least one relevant distinct daily-paper source "
                          "alongside hf-search sources and original-page web sources. ")
+    if os.getenv('LAB_SKIP_ARXIV_SEARCH', '').lower() in {'1', 'true', 'yes'}:
+        availability += ('The arXiv search API is disabled for this run after HTTP 429 failures. '
+                         'Do not delegate arxiv_search calls; use hf-search, hf-daily, and '
+                         'web_fetch of original public paper pages. Pass this availability '
+                         'constraint and the daily cache path to every researcher. ')
     return (f"Research date: {today}. Produce the complete English survey for the topic\n"
             f"{json.dumps(topic, ensure_ascii=False)}\n"
             + availability +
@@ -247,7 +252,9 @@ def _invoke_agent(agent, state, config, attempts=4):
         try:
             return agent.invoke(state, config=config)
         except (ModelConnectionError, ModelTimeoutError, ModelRateLimitError, ModelAPIError) as exc:
-            if attempt == attempts - 1 or getattr(exc, 'code', None) == 'insufficient_quota' or 'insufficient_quota' in str(exc):
+            exhausted = getattr(exc, 'code', None) in {'insufficient_quota', 'credit_balance_exhausted'}
+            exhausted = exhausted or any(term in str(exc).lower() for term in ('insufficient_quota', 'credit_balance_exhausted', 'no credits remaining'))
+            if attempt == attempts - 1 or exhausted:
                 raise
             response = getattr(exc, 'response', None)
             headers = getattr(response, 'headers', {})
@@ -273,7 +280,7 @@ def _prefetch_daily(topic):
     return [dict(record, source='hf-daily') for record in records[:8]]
 
 
-def main(topic):
+def main(topic, review_feedback=''):
     """Run one topic. Exit 0 for saved results, 1 for failure, 2 for missing topic."""
     topic = topic.strip()
     if not topic:
@@ -309,7 +316,10 @@ def main(topic):
             agent = build_lead_agent(backend, model)
             config = {"recursion_limit": RECURSION_LIMIT, "callbacks": [ResearchProgress()],
                       "configurable": {"thread_id": uuid.uuid4().hex}}
-            result = _invoke_agent(agent, {"messages": [{"role": "user", "content": build_prompt(topic, len(daily))}]}, config)
+            prompt = build_prompt(topic, len(daily))
+            if review_feedback:
+                prompt += '\nReviewer feedback to verify against retrieved primary sources and address: ' + review_feedback
+            result = _invoke_agent(agent, {"messages": [{"role": "user", "content": prompt}]}, config)
             # Enforce deterministic finalization/validation inside the sandbox even if
             # the lead finishes early. Nothing on the host rewrites downloaded artifacts.
             for repair in range(MAX_REPAIRS + 1):

@@ -132,6 +132,12 @@ class RetryTests(unittest.TestCase):
 
 
 class SourceToolTests(unittest.TestCase):
+    def test_temporarily_disabled_arxiv_does_not_request_the_blocked_api(self):
+        with patch.dict(os.environ, {'LAB_SKIP_ARXIV_SEARCH': '1'}), patch('tools._arxiv_request') as request:
+            self.assertTrue(tools.arxiv_search.invoke({'query': 'world model'}).startswith('ERROR:'))
+            self.assertEqual(tools.arxiv_search.invoke({'query': ':::'}), 'NO RESULTS')
+            request.assert_not_called()
+
     def test_daily_prefetch_preserves_actual_urls_and_identifies_the_real_tool(self):
         records = [dict(source(1, 'hf-daily'), title='World model paper', source='wrong external label')]
         with patch('research.hf_daily_papers') as mocked:
@@ -393,6 +399,15 @@ class RunnerTests(unittest.TestCase):
         with patch('research.make_model', return_value=Mock(model_name='fake')), patch('research.open_sandbox', sandbox), patch('research.upload'), patch('research.download', return_value=scripts), patch('research.build_lead_agent', return_value=graph), patch('research.save_outputs', side_effect=RuntimeError('still invalid')), patch('builtins.print'):
             self.assertEqual(research.main('topic'), 1)
         self.assertEqual(graph.invoke.call_count, research.MAX_REPAIRS + 1)
+
+    def test_exhausted_credit_is_not_retried(self):
+        from langchain_core.exceptions import ModelRateLimitError
+        graph = Mock()
+        graph.invoke.side_effect = ModelRateLimitError('credit_balance_exhausted: no credits remaining')
+        with patch('research.time.sleep') as sleep, self.assertRaises(ModelRateLimitError):
+            research._invoke_agent(graph, {'messages': []}, {'configurable': {'thread_id': 'quota-test'}})
+        self.assertEqual(graph.invoke.call_count, 1)
+        sleep.assert_not_called()
 
     def test_cli_empty_topic_and_all_stops_on_failure(self):
         with patch("sys.stderr"):

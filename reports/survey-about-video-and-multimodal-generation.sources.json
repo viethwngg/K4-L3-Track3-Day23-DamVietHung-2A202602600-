@@ -1,0 +1,210 @@
+[
+  {
+    "n": 1,
+    "id": "2209.14792",
+    "url": "https://huggingface.co/papers/2209.14792",
+    "title": "Make-A-Video: Text-to-Video Generation without Text-Video Data",
+    "date": "2022-09-29",
+    "source": "hf-search"
+  },
+  {
+    "n": 2,
+    "id": "https://arxiv.org/abs/2209.14792",
+    "url": "https://arxiv.org/abs/2209.14792",
+    "title": "Make-A-Video: Text-to-Video Generation without Text-Video Data",
+    "date": "2022-09-29",
+    "source": "web"
+  },
+  {
+    "n": 3,
+    "id": "2210.02399",
+    "url": "https://huggingface.co/papers/2210.02399",
+    "title": "Phenaki: Variable Length Video Generation From Open Domain Textual Description",
+    "date": "2022-10-05",
+    "source": "hf-search"
+  },
+  {
+    "n": 4,
+    "id": "https://arxiv.org/abs/2210.02399",
+    "url": "https://arxiv.org/abs/2210.02399",
+    "title": "Phenaki: Variable Length Video Generation From Open Domain Textual Description",
+    "date": "2022-10-05",
+    "source": "web"
+  },
+  {
+    "n": 5,
+    "id": "2204.03458",
+    "url": "https://huggingface.co/papers/2204.03458",
+    "title": "Video Diffusion Models",
+    "date": "2022-04-07",
+    "source": "hf-search"
+  },
+  {
+    "n": 6,
+    "id": "https://arxiv.org/abs/2204.03458",
+    "url": "https://arxiv.org/abs/2204.03458",
+    "title": "Video Diffusion Models",
+    "date": "2022-04-07",
+    "source": "web"
+  },
+  {
+    "n": 7,
+    "id": "2210.02303",
+    "url": "https://huggingface.co/papers/2210.02303",
+    "title": "Imagen Video: High Definition Video Generation with Diffusion Models",
+    "date": "2022-10-05",
+    "source": "hf-search"
+  },
+  {
+    "n": 8,
+    "id": "https://arxiv.org/abs/2210.02303",
+    "url": "https://arxiv.org/abs/2210.02303",
+    "title": "Imagen Video: High Definition Video Generation with Diffusion Models",
+    "date": "2022-10-05",
+    "source": "web"
+  },
+  {
+    "n": 9,
+    "id": "2408.06072",
+    "url": "https://huggingface.co/papers/2408.06072",
+    "title": "CogVideoX: Text-to-Video Diffusion Models with An Expert Transformer",
+    "date": "2024-08-12",
+    "source": "hf-search"
+  },
+  {
+    "n": 10,
+    "id": "https://github.com/zai-org/CogVideo",
+    "url": "https://github.com/zai-org/CogVideo",
+    "title": "GitHub - zai-org/CogVideo: text and image to video generation: CogVideoX (2024) and CogVideo (ICLR 2023)",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 11,
+    "id": "2402.04324",
+    "url": "https://huggingface.co/papers/2402.04324",
+    "title": "ConsistI2V: Enhancing Visual Consistency for Image-to-Video Generation",
+    "date": "2024-02-06",
+    "source": "hf-search"
+  },
+  {
+    "n": 12,
+    "id": "https://tiger-ai-lab.github.io/ConsistI2V/",
+    "url": "https://tiger-ai-lab.github.io/ConsistI2V/",
+    "title": "ConsistI2V: Enhancing Visual Consistency for Image-to-Video Generation",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 13,
+    "id": "https://causvid.github.io/",
+    "url": "https://causvid.github.io/",
+    "title": "From Slow Bidirectional to Fast Autoregressive Video Diffusion Models",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 14,
+    "id": "https://onevfall.github.io/project_page/ditctrl/",
+    "url": "https://onevfall.github.io/project_page/ditctrl/",
+    "title": "DiTCtrl: Exploring Attention Control in Multi-Modal Diffusion Transformer for Tuning-Free Multi-Prompt Longer Video Generation",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 15,
+    "id": "https://xduzhangjiayu.github.io/DiTraj_Project_Page/",
+    "url": "https://xduzhangjiayu.github.io/DiTraj_Project_Page/",
+    "title": "DiTraj: Training-free Trajectory Control for Video Diffusion Transformer",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 16,
+    "id": "https://github.com/MCG-NJU/MotionRAG",
+    "url": "https://github.com/MCG-NJU/MotionRAG",
+    "title": "MotionRAG: Motion Retrieval-Augmented Image-to-Video Generation",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 17,
+    "id": "2412.07730",
+    "url": "https://arxiv.org/abs/2412.07730",
+    "title": "STIV: Scalable Text and Image Conditioned Video Generation",
+    "date": "2024-12-10",
+    "source": "web"
+  },
+  {
+    "n": 18,
+    "id": "2610.12419",
+    "url": "https://huggingface.co/papers/2610.12419",
+    "title": "OneSearch-VL: Unified Multimodal Deep Research Agent for Image and Video",
+    "date": "2026-10-08",
+    "source": "hf-daily"
+  },
+  {
+    "n": 19,
+    "id": "https://github.com/KlingAIResearch/ReCamMaster",
+    "url": "https://github.com/KlingAIResearch/ReCamMaster",
+    "title": "ReCamMaster: Camera-Controlled Generative Rendering from A Single Video",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 20,
+    "id": "2512.13677",
+    "url": "https://arxiv.org/abs/2512.13677",
+    "title": "JoVA: Unified Multimodal Learning for Joint Video-Audio Generation and Editing",
+    "date": "2025-12-15",
+    "source": "web"
+  },
+  {
+    "n": 21,
+    "id": "2606.03672",
+    "url": "https://arxiv.org/abs/2606.03672",
+    "title": "Foley-Omni: A Unified Multimodal Generation Model from Task-Level Audio Synthesis to Complete Video Soundtrack Generation",
+    "date": "2026-06-02",
+    "source": "web"
+  },
+  {
+    "n": 22,
+    "id": "2609.38562",
+    "url": "https://huggingface.co/papers/2609.38562",
+    "title": "LongTake: Learning to Sustain Dynamics in Long-Horizon Video Generation",
+    "date": "2026-09-29",
+    "source": "hf-daily"
+  },
+  {
+    "n": 23,
+    "id": "2504.00983",
+    "url": "https://huggingface.co/papers/2504.00983",
+    "title": "WorldScore: A Unified Evaluation Benchmark for World Generation",
+    "date": "2025-04-01",
+    "source": "hf-search"
+  },
+  {
+    "n": 24,
+    "id": "https://proceedings.neurips.cc/paper_files/paper/2024/file/74eed5f568354c2e77dd9b018f38a9d4-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/74eed5f568354c2e77dd9b018f38a9d4-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "title": "T2VSafetyBench: Evaluating the Safety of Text-to-Video Generative Models",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 25,
+    "id": "https://proceedings.neurips.cc/paper_files/paper/2024/file/1eb543faf7c69e8a7eb8b85f70be818f-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/1eb543faf7c69e8a7eb8b85f70be818f-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "title": "SAFESORA: Towards Safety Alignment of Text2Video Generation via a Human Preference Dataset",
+    "date": "n.d.",
+    "source": "web"
+  },
+  {
+    "n": 26,
+    "id": "https://proceedings.neurips.cc/paper_files/paper/2025/file/c8bda0ee8b6bd4c56d9f8bdb3653e7db-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2025/file/c8bda0ee8b6bd4c56d9f8bdb3653e7db-Paper-Datasets_and_Benchmarks_Track.pdf",
+    "title": "Video-SafetyBench: A Benchmark for Safety Evaluation of Video LVLMs",
+    "date": "n.d.",
+    "source": "web"
+  }
+]

@@ -120,6 +120,8 @@ def arxiv_search(query: str, max_results: int = 10) -> str:
                  if word.upper() not in {"AND", "OR", "NOT"}]
         if not terms:
             return "NO RESULTS"
+        if os.getenv('LAB_SKIP_ARXIV_SEARCH', '').lower() in {'1', 'true', 'yes'}:
+            return 'ERROR: arXiv search is disabled for this run after rate-limit failures; use hf_search_papers and web_fetch of original paper URLs instead.'
         params = {"search_query": " AND ".join(f"all:{word}" for word in terms),
                   "sortBy": "submittedDate", "sortOrder": "descending", "start": 0,
                   "max_results": max(1, min(30, max_results))}
