@@ -20,6 +20,12 @@ docker pull python:3.12-slim
 giữ `SANDBOX=docker`. `EXA_API_KEY` là tùy chọn. Khóa chỉ được dùng ở host.
 Exa dùng header `x-api-key` theo [tài liệu hiện tại](https://exa.ai/docs/get-started/exa-mcp),
 thay cho tham số URL trong hướng dẫn lab ban đầu.
+Khi Exa bị giới hạn tốc độ hoặc lỗi tạm thời sau retry, `web_fetch` có thể đọc
+trực tiếp trang HTML/văn bản công khai từ arXiv, Hugging Face hoặc GitHub trên
+host. Mọi chuyển hướng đều được kiểm tra tên miền; không thực thi mã của trang.
+Researcher có thể dùng Daily Papers + papers search + trang bài báo gốc để duy
+trì ba họ nguồn khi API tìm kiếm arXiv không dùng được; nhãn nguồn vẫn phản ánh
+công cụ thực sự trả nội dung, không gán nhãn `arxiv` cho lời gọi API thất bại.
 
 ```powershell
 .\.venv\Scripts\python.exe tools.py
@@ -29,11 +35,28 @@ thay cho tham số URL trong hướng dẫn lab ban đầu.
 ```
 
 `--all` chạy tuần tự năm chủ đề trong `topics.md` và dừng khi một lượt lỗi.
+Nếu đã có một số báo cáo hợp lệ, dùng `research.py --all --resume` để chạy tiếp
+các chủ đề còn thiếu mà không trả phí sinh lại báo cáo đã đạt kiểm tra.
 Mỗi lượt thành công ghi ba tệp: `reports/<slug>.md` (báo cáo),
 `.sources.json` (nguồn trích dẫn), `.meta.json` (chủ đề, mô hình, số lần gọi và token
 của lead). Báo cáo và nguồn được giữ nguyên byte đã tải từ sandbox; finalizer và
 validator chạy trong sandbox trước khi lưu. Lượt lỗi không tạo bộ báo cáo mới.
 Metadata chỉ đếm token của lead, không bao gồm token của subagent.
+Trước khi lưu, mã kiểm tra URL theo họ nguồn, cấu trúc 3–6 phần theo chủ đề và
+trích dẫn trong mỗi đoạn/gạch đầu dòng. Nếu lỗi, lead có tối đa hai lượt sửa ngay
+trong sandbox. Exa không khóa dùng cooldown chung sau khi đã hết retry để tránh
+mọi researcher cùng chờ lại giới hạn đó cho từng URL.
+Lỗi kết nối/timeout/lỗi tạm thời của LLM có tối đa ba lượt thử lại từ checkpoint
+LangGraph trên cùng thread; sandbox vẫn được giữ trong lượt chạy đó. Checkpoint
+nằm trong RAM, không tồn tại sau khi tiến trình bị dừng. `--resume` chỉ bỏ qua
+các báo cáo đã hoàn tất và đã đạt kiểm tra, không khôi phục tiến trình đã bị tắt.
+`normalize_report.py` là helper bổ sung: chuẩn hóa chữ hoa/cấp tiêu đề cố định
+trong sandbox trước khi chạy finalizer có sẵn; không sửa khẳng định hay nguồn.
+Kết quả Daily Papers thật được nạp sẵn vào sandbox để subagent có thể dùng khi
+truy vấn riêng quá hẹp. Tất cả lỗi nội dung/metadata được trả cùng lúc cho lead.
+Với mô hình reasoning OpenAI cần Responses API để dùng tools, đặt
+`LAB_USE_RESPONSES_API=1` và `LAB_REASONING_EFFORT=low` trong `.env`.
+Các tùy chọn này được áp dụng trong `research.py`; `model.py` có sẵn không sửa.
 
 Kiểm tra mã không cần khóa LLM:
 

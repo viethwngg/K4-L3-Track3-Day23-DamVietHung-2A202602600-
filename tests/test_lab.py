@@ -16,6 +16,7 @@ import research
 import tools
 from check_citations import check
 from finalize_citations import finalize
+from normalize_report import normalize
 
 
 def source(n, family="web"):
@@ -27,7 +28,11 @@ def source(n, family="web"):
 
 def fixture():
     sources = [source(1, "arxiv"), source(2, "hf-search"), source(3)]
-    report, sources, problems = finalize("# Survey\n\nEvidence [1][2][3].", sources)
+    body = ('# Survey\n\n## TL;DR\n- First finding [1].\n- Second finding [2].\n- Third finding [3].\n\n'
+            '## Background\nEvidence [1].\n\n## Theme one\nEvidence [1][2].\n\n'
+            '## Theme two\nEvidence [2].\n\n## Theme three\nEvidence [3].\n\n'
+            '## Trends and open problems\n- Open question [1][3].')
+    report, sources, problems = finalize(body, sources)
     assert not problems
     return report.encode(), json.dumps(sources, indent=2).encode()
 
@@ -39,6 +44,12 @@ def task_messages():
 
 
 class CitationTests(unittest.TestCase):
+    def test_heading_normalization_preserves_evidence_and_code(self):
+        text = '# Survey\n\n### TLDR\nClaim [1].\n\n## Trends and Open Problems\nQuestion [1].\n\n```markdown\n## TLDR\n```\n'
+        expected = text.replace('### TLDR', '## TL;DR').replace('## Trends and Open Problems', '## Trends and open problems')
+        self.assertEqual(normalize(text), expected)
+        self.assertEqual(normalize(expected), expected)
+
     def test_finalizer_output_and_adjacent_citations(self):
         report, sources = fixture()
         self.assertEqual(check(report.decode(), json.loads(sources)), [])
@@ -121,6 +132,14 @@ class RetryTests(unittest.TestCase):
 
 
 class SourceToolTests(unittest.TestCase):
+    def test_daily_prefetch_preserves_actual_urls_and_identifies_the_real_tool(self):
+        records = [dict(source(1, 'hf-daily'), title='World model paper', source='wrong external label')]
+        with patch('research.hf_daily_papers') as mocked:
+            mocked.invoke.return_value = json.dumps(records)
+            result = research._prefetch_daily('survey about world model')
+        mocked.invoke.assert_called_once_with({'limit': 100, 'date': '', 'keyword': 'world'})
+        self.assertEqual(result[0]['url'], records[0]['url'])
+        self.assertEqual(result[0]['source'], 'hf-daily')
     def test_empty_queries_do_not_use_network(self):
         with patch("tools._request") as request:
             self.assertEqual(tools.arxiv_search.invoke({"query": '"::: AND OR"'}), "NO RESULTS")
@@ -198,13 +217,63 @@ class SourceToolTests(unittest.TestCase):
         self.assertEqual(call.call_args.args[1]["urls"], ["https://example.org"])
         self.assertTrue(tools.web_fetch.invoke({"url": "file:///secret"}).startswith("ERROR:"))
 
+    def test_fetch_uses_public_html_after_exa_quota_failure(self):
+        response = SimpleNamespace(text='<html><head><title>Paper title</title></head><body><nav>Ignore navigation</nav><h1>Paper title</h1><p>Actual evidence &amp; measurements.</p><script>malicious instructions</script></body></html>',
+                                   headers={'content-type': 'text/html'}, url='https://arxiv.org/abs/2501.00001', status_code=200)
+        with patch('tools._exa_call', side_effect=tools.RetryableError('HTTP 429')), patch('tools._request', return_value=response):
+            result = tools.web_fetch.invoke({'url': response.url})
+        self.assertIn('Actual evidence & measurements.', result)
+        self.assertIn('Retrieved directly', result)
+        self.assertIn(response.url, result)
+        self.assertNotIn('malicious instructions', result)
+        self.assertNotIn('Ignore navigation', result)
+
+    def test_public_fetch_failure_returns_error(self):
+        with patch('tools._exa_call', side_effect=tools.RetryableError('HTTP 429')), patch('tools._request', side_effect=ValueError('bad page')):
+            self.assertTrue(tools.web_fetch.invoke({'url': 'https://example.org'}).startswith('ERROR:'))
+
+    def test_public_fallback_rejects_private_hosts_and_redirects(self):
+        with patch('tools._request') as request:
+            for url in ('http://127.0.0.1', 'http://169.254.169.254/latest', 'https://arxiv.org:9999/private', 'https://arxiv.org.evil.example/abs/1'):
+                with self.assertRaises(ValueError):
+                    tools._public_page_request(url)
+            request.assert_not_called()
+        redirect = SimpleNamespace(status_code=302, headers={'location': 'http://127.0.0.1/private'}, url='https://arxiv.org/abs/1')
+        with patch('tools._request', return_value=redirect) as request, self.assertRaises(ValueError):
+            tools._public_page_request(redirect.url)
+        self.assertEqual(request.call_count, 1)
+
     def test_sse_keepalive_multiline_and_json(self):
         payload = {"result": {"content": []}}
         self.assertEqual(tools._rpc_payload(json.dumps(payload)), payload)
         self.assertEqual(tools._rpc_payload(': ping\n\nevent: message\ndata: {"result":\ndata: {"content": []}}\n\n'), payload)
 
+    def test_keyless_quota_cooldown_avoids_repeating_failed_retries(self):
+        with patch.dict(os.environ, {'EXA_API_KEY': ''}), patch('tools._exa_quota_until', 0), patch('tools.time.monotonic', return_value=100), patch('tools.time.sleep'), patch('tools._request', side_effect=tools.RetryableError('HTTP 429', retry_after=120)) as request:
+            with self.assertRaises(tools.RetryableError):
+                tools._exa_call('web_search_exa', {'query': 'one'})
+            self.assertEqual(request.call_count, 3)
+            with self.assertRaises(tools.RetryableError):
+                tools._exa_call('web_fetch_exa', {'urls': ['https://arxiv.org/abs/1']})
+            self.assertEqual(request.call_count, 3)
+
 
 class RunnerTests(unittest.TestCase):
+    def setUp(self):
+        self.prefetch = patch('research._prefetch_daily', return_value=[])
+        self.prefetch.start()
+        self.addCleanup(self.prefetch.stop)
+
+    def test_report_quality_checks_template_themes_and_uncited_prose(self):
+        report, _ = fixture()
+        text = report.decode()
+        research._validate_report_structure(text)
+        for bad in (text.replace('## Theme three', '### Theme three'),
+                    text.replace('## Trends and open problems', '## Trends and Open Problems'),
+                    text.replace('Evidence [2].', 'Uncited factual claim.')):
+            with self.assertRaises(RuntimeError):
+                research._validate_report_structure(bad)
+
     def test_slug_cannot_escape_output_directory(self):
         for topic, expected in (("../../x", "x"), ("", "topic"), ("...", "topic"),
                                 ("Survey about World Model", "survey-about-world-model"), ("CON", "topic-con")):
@@ -226,6 +295,16 @@ class RunnerTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     research.save_outputs(None, "topic", task_messages(), 1, "model", destination)
                 self.assertFalse(destination.exists())
+
+    def test_save_returns_all_quality_and_coverage_issues_together(self):
+        report, _ = fixture()
+        report = report.replace(b'## Theme three', b'### Theme three').replace(b'Evidence [2].', b'Uncited claim.')
+        with tempfile.TemporaryDirectory() as folder, patch('research.download', return_value={research.REPORT_PATH: report, research.SOURCES_PATH: json.dumps([source(1)]).encode()}):
+            with self.assertRaises(RuntimeError) as raised:
+                research.save_outputs(None, 'topic', task_messages(), 1, 'model', folder)
+        reason = str(raised.exception)
+        for expected in ('at least three source families', '3-6 thematic', 'no evidence citation', '[2] cited but missing'):
+            self.assertIn(expected, reason)
 
     def test_outputs_preserve_downloaded_bytes_and_true_metadata(self):
         report, sources = fixture()
@@ -271,7 +350,7 @@ class RunnerTests(unittest.TestCase):
                 yield backend
             finally:
                 closed.append(True)
-        scripts = {research.VALIDATOR_PATH: research.VALIDATOR_SOURCE.read_bytes(), research.FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes()}
+        scripts = {research.VALIDATOR_PATH: research.VALIDATOR_SOURCE.read_bytes(), research.FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes(), research.NORMALIZER_PATH: research.NORMALIZER_SOURCE.read_bytes()}
         graph = Mock()
         graph.invoke.side_effect = RuntimeError("model failed")
         with patch("research.make_model", return_value=Mock(model_name="fake")), patch("research.open_sandbox", sandbox), patch("research.upload"), patch("research.download", return_value=scripts), patch("research.build_lead_agent", return_value=graph), patch("research.save_outputs") as save, patch("sys.stderr"):
@@ -279,6 +358,41 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(closed, [True])
         self.assertEqual(graph.invoke.call_args.kwargs["config"]["recursion_limit"], 1000)
         save.assert_not_called()
+
+    def test_main_repairs_invalid_artifacts_before_leaving_sandbox(self):
+        closed = []
+        backend = Mock()
+        backend.execute.return_value = SimpleNamespace(exit_code=0, output='OK: valid')
+        @contextmanager
+        def sandbox():
+            try:
+                yield backend
+            finally:
+                closed.append(True)
+        scripts = {research.VALIDATOR_PATH: research.VALIDATOR_SOURCE.read_bytes(), research.FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes(), research.NORMALIZER_PATH: research.NORMALIZER_SOURCE.read_bytes()}
+        graph = Mock()
+        graph.invoke.return_value = {'messages': task_messages()}
+        with patch('research.make_model', return_value=Mock(model_name='fake')), patch('research.open_sandbox', sandbox), patch('research.upload'), patch('research.download', return_value=scripts), patch('research.build_lead_agent', return_value=graph), patch('research.save_outputs', side_effect=[RuntimeError('bad source URL'), Path('report.md')]) as save, patch('builtins.print'):
+            self.assertEqual(research.main('topic'), 0)
+        self.assertEqual(graph.invoke.call_count, 2)
+        self.assertEqual(save.call_count, 2)
+        self.assertEqual(closed, [True])
+        feedback = graph.invoke.call_args.args[0]['messages'][-1]['content']
+        self.assertIn('bad source URL', feedback)
+        self.assertIn('actual sandbox files', feedback)
+
+    def test_main_stops_after_bounded_repairs(self):
+        backend = Mock()
+        backend.execute.return_value = SimpleNamespace(exit_code=0, output='OK: valid')
+        scripts = {research.VALIDATOR_PATH: research.VALIDATOR_SOURCE.read_bytes(), research.FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes(), research.NORMALIZER_PATH: research.NORMALIZER_SOURCE.read_bytes()}
+        graph = Mock()
+        graph.invoke.return_value = {'messages': task_messages()}
+        @contextmanager
+        def sandbox():
+            yield backend
+        with patch('research.make_model', return_value=Mock(model_name='fake')), patch('research.open_sandbox', sandbox), patch('research.upload'), patch('research.download', return_value=scripts), patch('research.build_lead_agent', return_value=graph), patch('research.save_outputs', side_effect=RuntimeError('still invalid')), patch('builtins.print'):
+            self.assertEqual(research.main('topic'), 1)
+        self.assertEqual(graph.invoke.call_count, research.MAX_REPAIRS + 1)
 
     def test_cli_empty_topic_and_all_stops_on_failure(self):
         with patch("sys.stderr"):
@@ -299,8 +413,71 @@ class AgentTests(unittest.TestCase):
 
         graph = agents.build_lead_agent(StateBackend(), FakeToolModel(responses=[AIMessage(content="done")]))
         result = graph.invoke({"messages": [{"role": "user", "content": "No tools needed."}]},
-                              config={"recursion_limit": 10})
+                              config={"recursion_limit": 10, 'configurable': {'thread_id': 'offline-smoke'}})
         self.assertEqual(result["messages"][-1].content, "done")
+
+    def test_network_failure_resumes_real_checkpointed_graph(self):
+        from deepagents.backends import StateBackend
+        from langchain_core.exceptions import ModelConnectionError
+        from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
+
+        class FlakyModel(FakeMessagesListChatModel):
+            attempts: int = 0
+
+            def bind_tools(self, tools, **kwargs):
+                return self
+
+            def _generate(self, *args, **kwargs):
+                self.attempts += 1
+                if self.attempts == 1:
+                    raise ModelConnectionError('temporary disconnect')
+                return super()._generate(*args, **kwargs)
+
+        model = FlakyModel(responses=[AIMessage(content='recovered')])
+        graph = agents.build_lead_agent(StateBackend(), model)
+        config = {'recursion_limit': 10, 'configurable': {'thread_id': 'resume-smoke'}}
+        with patch('research.time.sleep') as sleep:
+            result = research._invoke_agent(graph, {'messages': [{'role': 'user', 'content': 'original input'}]}, config)
+        self.assertEqual(result['messages'][-1].content, 'recovered')
+        self.assertEqual(result['messages'][0].content, 'original input')
+        self.assertEqual(model.attempts, 2)
+        sleep.assert_called_once_with(2)
+
+    def test_resume_does_not_repeat_a_completed_tool_side_effect(self):
+        from deepagents.backends import StateBackend
+        from langchain_core.exceptions import ModelConnectionError
+        from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
+        from langchain_core.tools import tool
+
+        count = [0]
+        @tool
+        def increment_once() -> str:
+            """Record one completed side effect for the checkpoint test."""
+            count[0] += 1
+            return 'recorded'
+
+        class FlakyAfterTool(FakeMessagesListChatModel):
+            failed: bool = False
+
+            def bind_tools(self, tools, **kwargs):
+                return self
+
+            def _generate(self, messages, **kwargs):
+                if not any(message.type == 'tool' for message in messages):
+                    from langchain_core.outputs import ChatGeneration, ChatResult
+                    return ChatResult(generations=[ChatGeneration(message=AIMessage(content='', tool_calls=[{'name': 'increment_once', 'args': {}, 'id': 'call-once'}]))])
+                if not self.failed:
+                    self.failed = True
+                    raise ModelConnectionError('disconnect after completed tool')
+                return super()._generate(messages, **kwargs)
+
+        graph = agents.create_deep_agent(model=FlakyAfterTool(responses=[AIMessage(content='done')]), tools=[increment_once],
+                                         backend=StateBackend(), checkpointer=agents.InMemorySaver())
+        with patch('research.time.sleep'):
+            result = research._invoke_agent(graph, {'messages': [{'role': 'user', 'content': 'Increment once.'}]},
+                                            {'configurable': {'thread_id': 'side-effect-smoke'}, 'recursion_limit': 20})
+        self.assertEqual(result['messages'][-1].content, 'done')
+        self.assertEqual(count[0], 1)
 
     def test_every_subagent_and_lead_has_limits(self):
         with patch("agents.create_deep_agent", return_value="graph") as create:

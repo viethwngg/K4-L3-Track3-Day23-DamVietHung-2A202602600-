@@ -1,0 +1,226 @@
+[
+  {
+    "n": 1,
+    "id": "https://arxiv.org/abs/2301.11270",
+    "url": "https://arxiv.org/abs/2301.11270",
+    "title": "Principled Reinforcement Learning with Human Feedback from Pairwise or K-wise Comparisons",
+    "date": "2023-01-26",
+    "source": "web"
+  },
+  {
+    "n": 2,
+    "id": "https://arxiv.org/abs/2407.16216",
+    "url": "https://arxiv.org/abs/2407.16216",
+    "title": "Reinforcement Learning for LLM Post-Training: A Survey",
+    "date": "2024-07-23",
+    "source": "web"
+  },
+  {
+    "n": 3,
+    "id": "https://arxiv.org/abs/2206.02336",
+    "url": "https://arxiv.org/abs/2206.02336",
+    "title": "Making Large Language Models Better Reasoners with Step-Aware Verifier",
+    "date": "2022-06-06",
+    "source": "web"
+  },
+  {
+    "n": 4,
+    "id": "https://arxiv.org/abs/2507.08649",
+    "url": "https://arxiv.org/abs/2507.08649",
+    "title": "Leanabell-Prover-V2: Verifier-integrated Reasoning for Formal Theorem Proving via Reinforcement Learning",
+    "date": "2025-07-11",
+    "source": "web"
+  },
+  {
+    "n": 5,
+    "id": "https://arxiv.org/abs/2410.08146",
+    "url": "https://arxiv.org/abs/2410.08146",
+    "title": "Rewarding Progress: Scaling Automated Process Verifiers for LLM Reasoning",
+    "date": "2024-10-10",
+    "source": "web"
+  },
+  {
+    "n": 6,
+    "id": "2508.08221",
+    "url": "https://huggingface.co/papers/2508.08221",
+    "title": "Part I: Tricks or Traps? A Deep Dive into RL for LLM Reasoning",
+    "date": "2025-08-11",
+    "source": "hf-search"
+  },
+  {
+    "n": 7,
+    "id": "https://arxiv.org/abs/2502.06773",
+    "url": "https://arxiv.org/abs/2502.06773",
+    "title": "On the Emergence of Thinking in LLMs I: Searching for the Right Intuition",
+    "date": "2025-02-10",
+    "source": "web"
+  },
+  {
+    "n": 8,
+    "id": "https://arxiv.org/abs/2502.06737",
+    "url": "https://arxiv.org/abs/2502.06737",
+    "title": "VersaPRM: Multi-Domain Process Reward Model via Synthetic Reasoning Data",
+    "date": "2025-02-10",
+    "source": "web"
+  },
+  {
+    "n": 9,
+    "id": "https://arxiv.org/abs/2504.11343",
+    "url": "https://arxiv.org/abs/2504.11343",
+    "title": "A Minimalist Approach to LLM Reasoning: from Rejection Sampling to Reinforce",
+    "date": "2025-04-15",
+    "source": "web"
+  },
+  {
+    "n": 10,
+    "id": "https://arxiv.org/abs/2505.02391",
+    "url": "https://arxiv.org/abs/2505.02391",
+    "title": "Optimizing Chain-of-Thought Reasoners via Gradient Variance Minimization in Rejection Sampling and RL",
+    "date": "2025-05-05",
+    "source": "web"
+  },
+  {
+    "n": 11,
+    "id": "https://arxiv.org/abs/2505.15034",
+    "url": "https://arxiv.org/abs/2505.15034",
+    "title": "RL Tango: Reinforcing Generator and Verifier Together for Language Reasoning",
+    "date": "2025-05-21",
+    "source": "web"
+  },
+  {
+    "n": 12,
+    "id": "https://arxiv.org/abs/2504.01005",
+    "url": "https://arxiv.org/abs/2504.01005",
+    "title": "When To Solve, When To Verify: Compute-Optimal Problem Solving and Generative Verification for LLM Reasoning",
+    "date": "2025-04-01",
+    "source": "web"
+  },
+  {
+    "n": 13,
+    "id": "https://arxiv.org/abs/2502.14768",
+    "url": "https://arxiv.org/abs/2502.14768",
+    "title": "Logic-RL: Unleashing LLM Reasoning with Rule-Based Reinforcement Learning",
+    "date": "2025-02-20",
+    "source": "web"
+  },
+  {
+    "n": 14,
+    "id": "https://arxiv.org/abs/2503.15478",
+    "url": "https://arxiv.org/abs/2503.15478",
+    "title": "SWEET-RL: Training Multi-Turn LLM Agents on Collaborative Reasoning Tasks",
+    "date": "2025-03-19",
+    "source": "web"
+  },
+  {
+    "n": 15,
+    "id": "https://arxiv.org/abs/2505.14216",
+    "url": "https://arxiv.org/abs/2505.14216",
+    "title": "Reinforcement Learning vs. Distillation: Understanding Accuracy and Capability in LLM Reasoning",
+    "date": "2025-05-20",
+    "source": "web"
+  },
+  {
+    "n": 16,
+    "id": "https://arxiv.org/abs/2508.13755",
+    "url": "https://arxiv.org/abs/2508.13755",
+    "title": "Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration",
+    "date": "2025-08-19",
+    "source": "web"
+  },
+  {
+    "n": 17,
+    "id": "2610.08215",
+    "url": "https://huggingface.co/papers/2610.08215",
+    "title": "Learn2Play Bench: How Well Do LLM Agents Learn from Experience in Unfamiliar Environments?",
+    "date": "2026-10-08",
+    "source": "hf-daily"
+  },
+  {
+    "n": 18,
+    "id": "https://arxiv.org/abs/2403.13787",
+    "url": "https://arxiv.org/abs/2403.13787",
+    "title": "RewardBench: Evaluating Reward Models for Language Modeling",
+    "date": "2024-03-20",
+    "source": "web"
+  },
+  {
+    "n": 19,
+    "id": "https://arxiv.org/abs/2410.15115",
+    "url": "https://arxiv.org/abs/2410.15115",
+    "title": "On Designing Effective RL Reward at Training Time for LLM Reasoning",
+    "date": "2024-10-19",
+    "source": "web"
+  },
+  {
+    "n": 20,
+    "id": "https://arxiv.org/abs/2410.23726",
+    "url": "https://arxiv.org/abs/2410.23726",
+    "title": "Towards Reliable Alignment: Uncertainty-aware RLHF",
+    "date": "2024-10-31",
+    "source": "web"
+  },
+  {
+    "n": 21,
+    "id": "https://arxiv.org/abs/2604.15149",
+    "url": "https://arxiv.org/abs/2604.15149",
+    "title": "LLMs Gaming Verifiers: RLVR can Lead to Reward Hacking",
+    "date": "2026-04-16",
+    "source": "web"
+  },
+  {
+    "n": 22,
+    "id": "https://arxiv.org/abs/2510.13744",
+    "url": "https://arxiv.org/abs/2510.13744",
+    "title": "Hard2Verify: A Step-Level Verification Benchmark for Open-Ended Frontier Math",
+    "date": "2025-10-15",
+    "source": "web"
+  },
+  {
+    "n": 23,
+    "id": "https://arxiv.org/abs/2506.13342",
+    "url": "https://arxiv.org/abs/2506.13342",
+    "title": "Verifying the Verifiers: Unveiling Pitfalls and Potentials in Fact Verifiers",
+    "date": "2025-06-16",
+    "source": "web"
+  },
+  {
+    "n": 24,
+    "id": "https://arxiv.org/abs/2304.05302",
+    "url": "https://arxiv.org/abs/2304.05302",
+    "title": "RRHF: Rank Responses to Align Language Models with Human Feedback without tears",
+    "date": "2023-04-11",
+    "source": "web"
+  },
+  {
+    "n": 25,
+    "id": "https://arxiv.org/abs/2308.01320",
+    "url": "https://arxiv.org/abs/2308.01320",
+    "title": "DeepSpeed-Chat: Easy, Fast and Affordable RLHF Training of ChatGPT-like Models at All Scales",
+    "date": "2023-08-02",
+    "source": "web"
+  },
+  {
+    "n": 26,
+    "id": "2309.00267",
+    "url": "https://huggingface.co/papers/2309.00267",
+    "title": "RLAIF: Scaling Reinforcement Learning from Human Feedback with AI Feedback",
+    "date": "2023-09-01",
+    "source": "hf-search"
+  },
+  {
+    "n": 27,
+    "id": "https://arxiv.org/abs/2508.10874",
+    "url": "https://arxiv.org/abs/2508.10874",
+    "title": "SSRL: Self-Search Reinforcement Learning",
+    "date": "2025-08-14",
+    "source": "web"
+  },
+  {
+    "n": 28,
+    "id": "2610.08077",
+    "url": "https://huggingface.co/papers/2610.08077",
+    "title": "Self-Retrospection Distillation: Turning Post-hoc Experiences into Prior Foresight",
+    "date": "2026-10-06",
+    "source": "hf-daily"
+  }
+]

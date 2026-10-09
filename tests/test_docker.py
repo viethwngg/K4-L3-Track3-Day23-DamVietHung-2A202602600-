@@ -19,7 +19,10 @@ class DockerTests(unittest.TestCase):
                 report, sources = fixture()
                 upload(backend, {REPORT_PATH: report, SOURCES_PATH: sources,
                                  VALIDATOR_PATH: research.VALIDATOR_SOURCE.read_bytes(),
-                                 FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes()})
+                                 FINALIZER_PATH: research.FINALIZER_SOURCE.read_bytes(),
+                                 research.NORMALIZER_PATH: research.NORMALIZER_SOURCE.read_bytes()})
+                upload(backend, {REPORT_PATH: report.replace(b'## Trends and open problems', b'### Trends and Open Problems')})
+                self.assertEqual(backend.execute(f'python3 {research.NORMALIZER_PATH}').exit_code, 0)
                 self.assertEqual(backend.execute(f"python3 {FINALIZER_PATH}").exit_code, 0)
                 result = backend.execute(f"python3 {VALIDATOR_PATH}")
                 self.assertEqual(result.exit_code, 0, result.output)
