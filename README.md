@@ -4,6 +4,50 @@ Lab dựng một **hệ thống deep research đa tác tử**: người dùng ch
 
 Hình thức: **bài thực hành cá nhân**. Ngôn ngữ lập trình: Python 3.11 trở lên.
 
+## Chạy bản đã cài đặt bằng Docker trên Windows
+
+Bốn tệp bài tập đã được cài đặt. `.env.example` chọn sandbox Docker cục bộ;
+không cần khóa Daytona khi dùng Docker. Mở Docker Desktop và chọn Linux containers.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+Copy-Item .env.example .env  # chỉ chạy nếu chưa có .env; giữ nguyên cấu hình hiện có
+docker pull python:3.12-slim
+```
+
+Điền `LAB_MODEL` và khóa nhà cung cấp vào `.env`, dùng mô hình hỗ trợ tool calling;
+giữ `SANDBOX=docker`. `EXA_API_KEY` là tùy chọn. Khóa chỉ được dùng ở host.
+Exa dùng header `x-api-key` theo [tài liệu hiện tại](https://exa.ai/docs/get-started/exa-mcp),
+thay cho tham số URL trong hướng dẫn lab ban đầu.
+
+```powershell
+.\.venv\Scripts\python.exe tools.py
+.\.venv\Scripts\python.exe research.py "survey about world model"
+.\.venv\Scripts\python.exe research.py --all
+.\.venv\Scripts\python.exe self_check.py
+```
+
+`--all` chạy tuần tự năm chủ đề trong `topics.md` và dừng khi một lượt lỗi.
+Mỗi lượt thành công ghi ba tệp: `reports/<slug>.md` (báo cáo),
+`.sources.json` (nguồn trích dẫn), `.meta.json` (chủ đề, mô hình, số lần gọi và token
+của lead). Báo cáo và nguồn được giữ nguyên byte đã tải từ sandbox; finalizer và
+validator chạy trong sandbox trước khi lưu. Lượt lỗi không tạo bộ báo cáo mới.
+Metadata chỉ đếm token của lead, không bao gồm token của subagent.
+
+Kiểm tra mã không cần khóa LLM:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+$env:RUN_DOCKER_TESTS = "1"
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+Kiểm tra Docker tạo container thật, chạy finalizer/validator, tải tệp và xác nhận
+container bị xóa sau lỗi. Nó dùng dữ liệu thử trong sandbox, không sinh báo cáo
+nộp bài. Các tệp có sẵn `model.py`, `sandbox.py`, `self_check.py` và
+`finalize_citations.py` được giữ nguyên.
+
 ## 1. Mục tiêu học tập
 
 Sau lab, bạn có thể:
